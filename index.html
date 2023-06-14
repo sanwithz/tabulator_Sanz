@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link href="https://unpkg.com/tabulator-tables@5.2.4/dist/css/tabulator_site.min.css" rel="stylesheet">
+ <?!=include('css-light')?>
+<!-- Font Awesome -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  </head>
+  <body>
+    <center>
+        <div class="search-box-outer">
+        <div class="search-box-inner">
+          <label> ค้นหาจากชื่อได้เลยจ้า </label><br/>
+        <input type="text" id="search" placeholder="พิมพ์คำที่ต้องการค้นหา..." style="width: 30%; margin-top:10px;">
+        </div>
+        </div>
+    </center>
+    <div id="example-table" class="dark-data-table"></div>
+    
+    <!-- CDN -->
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.2.3/dist/js/tabulator.min.js"></script>
+    
+    <!-- script -->
+    <script>
+var deleteIcon = function(cell, formatterParams){ 
+return "<i class='fa fa-trash' style='color:red'></i>"};
+
+const elements ={}
+document.addEventListener("DOMContentLoaded",pageLoad)
+
+
+function pageLoad(){
+elements.search = document.getElementById("search")
+elements.search.addEventListener("input",searchData)
+loadData()
+}
+
+function loadData(){
+google.script.run
+.withSuccessHandler((tabledata)=> {
+//จัดข้อมูลแบบเข้าไปในตารางของ Tabulator
+    elements.table = new Tabulator("#example-table", {
+        data:tabledata,           //load row data from array
+        layout:"fitColumns",      //fit columns to width of table
+        responsiveLayout:"hide",  //hide columns that dont fit on the table
+        tooltips:true,            //show tool tips on cells
+        addRowPos:"top",          //when adding a new row, add it to the top of the table
+        history:true,             //allow undo and redo actions on the table
+        pagination:"local",       //paginate the data
+        paginationSize:7,         //allow 7 rows per page of data
+        paginationCounter:"rows", //display count of paginated rows in footer
+        movableColumns:true,      //allow column order to be changed
+        initialSort:[             //set the initial sort order of the data
+            {column:"List", dir:"asc"},
+        ],
+
+    columns:[                 
+      //define the table columns
+        	 	{title:"Id", field:"Id"},
+            {title:"List", field:"List"},
+            {title:"Type", field:"Type"},
+            {title:"Status", field:"Status"},
+            {title:"Company", field:"Company"},
+            {title:"Date", field:"Date"},
+            {title:'Image', field:"Image",
+                            formatter:"image", 
+                            formatterParams:{height:"20px",width:"20px",}, 
+                            cellClick:function(e, cell){window.open(cell.getValue())}},
+            {title:'Icon', formatter:deleteIcon},
+            {title:'Bar Chart', field:"Qty",
+                            formatter:"progress", 
+                            formatterParams:{color:["red", "orange", "#00dd00"]}, 
+                            sorter:"number", width:100},
+            {title:"Condition", field:"Qty",
+                            vertAlign:"middle", hozAlign:"center",
+                            formatter:"traffic", 
+                            formatterParams:{min:0,max:100,color:["red", "orange", "#00dd00"],}},
+            ],
+});
+}).getData()
+}
+
+function searchData(e){
+  elements.table.setFilter("List", "like", e.target.value)
+}
+
+</script>
+  </body>
+</html>
